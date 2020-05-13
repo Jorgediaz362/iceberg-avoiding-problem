@@ -35,12 +35,31 @@ unsigned int iceberg_avoiding_exhaustive(const grid& setting) {
   // Compute the path length, and check that it is legal.
   const size_t steps = setting.rows() + setting.columns() - 2;
   assert(steps < 64);
-
   unsigned int count_paths = 0;
-    
-  // TODO: implement the exhaustive optimization algorithm, then delete this
-  // comment.
 
+	for (int bits = 0; bits <= (pow(2, steps) - 1);bits++) {
+		path candidate(setting);
+		int invalid = 0;
+		for(size_t k = 0; k <= (steps - 1); k++) {
+			auto bit = (bits>>k)&1;
+			if (bit == 1) {
+				if (candidate.is_step_valid(STEP_DIRECTION_RIGHT)){
+					candidate.add_step(STEP_DIRECTION_RIGHT);
+				}
+				else 
+					invalid++;
+			}
+			else {
+				if (candidate.is_step_valid(STEP_DIRECTION_DOWN)) {
+					candidate.add_step(STEP_DIRECTION_DOWN);
+				}
+				else 
+					invalid++;
+			}
+		}
+		if(invalid == 0)
+			count_paths++;
+	}
   return count_paths;
 }
 
