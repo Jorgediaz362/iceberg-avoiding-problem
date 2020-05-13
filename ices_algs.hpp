@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// crossing_algs.hpp
+// ices_algs.hpp
 //
 // Algorithms that solve the iceberg avoiding problem.
 //
@@ -73,16 +73,37 @@ unsigned int iceberg_avoiding_dyn_prog(const grid& setting) {
   assert(setting.rows() > 0);
   assert(setting.columns() > 0);
 
-
   const int DIM=100;
   std::vector<std::vector<unsigned>> A(DIM, std::vector<unsigned>(DIM));
 
   A[0][0] = 1;
-    
-  // TODO: implement the dynamic programming algorithm, then delete this
-  // comment.
-  
-  return A[setting.rows()-1][setting.columns()-1];
-}
+  auto r = setting.rows(), c = setting.columns();
+	for (size_t i = 0; i < r; i++){
+		for (size_t j = 0; j < c; j++){
+			if(setting.get(i,j) == CELL_ICEBERG){
+				A[i][j] = 0;
+			}
+			int from_above = 0, from_left = 0;
+			bool a_true = false, l_true = false;
+			
+			if( i > 0 && (setting.get(i-1,j) != CELL_ICEBERG)) {
+				from_above = A[i-1][j];
+				a_true = true;
+			}
+			if( j > 0 && (setting.get(i,j-1) != CELL_ICEBERG)) {
+				from_left = A[i][j-1];
+				l_true = true;
+			}
+			if (a_true && l_true)
+				A[i][j] = from_left + from_above;
+			else if(!a_true && l_true)
+				A[i][j] = from_left;
+			else if(a_true && !l_true)
+				A[i][j] = from_above;
+			
+		}
 
+	}
+  return A[r-1][c-1];
+}
 }
